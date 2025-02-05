@@ -5,8 +5,8 @@ from aiogram.utils import executor
 import requests
 
 # Получаем токен и URL из переменных окружения
-TOKEN = os.getenv("TOKEN")
-WEB_APP_URL = os.getenv("WEB_APP_URL")
+TOKEN = '1828791789:AAHvMA095PX9LPWNyVwcPzOJkGTvBDgx8GY'
+WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxCwMASb2tiVt_YZus07sgRIz7hpXE7d8KfBbanNr21JPDZayAoxyE7DZfx4JNCVELxOQ/exec'
 
 # Проверка, если токен или URL пустые
 if not TOKEN or not WEB_APP_URL:
