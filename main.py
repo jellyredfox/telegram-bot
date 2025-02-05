@@ -4,6 +4,7 @@ from aiogram.types import ParseMode
 from aiogram.utils import executor
 import requests
 
+
 # Получаем токен и URL из переменных окружения
 TOKEN = '1828791789:AAHvMA095PX9LPWNyVwcPzOJkGTvBDgx8GY'
 WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxCwMASb2tiVt_YZus07sgRIz7hpXE7d8KfBbanNr21JPDZayAoxyE7DZfx4JNCVELxOQ/exec'
@@ -48,5 +49,9 @@ async def record_hours(message: types.Message):
 
 if __name__ == "__main__":
     # Удаляем возможный старый webhook перед запуском polling
-    bot.delete_webhook()
+    import asyncio
+    async def delete_webhook():
+        await bot.delete_webhook()
+
+    asyncio.run(delete_webhook())  # Запускаем асинхронную функцию удаления webhook
     executor.start_polling(dp, skip_updates=True)
