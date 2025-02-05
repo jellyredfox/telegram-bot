@@ -47,4 +47,6 @@ async def record_hours(message: types.Message):
         await message.reply("Пожалуйста, отправьте количество часов в виде числа.")
 
 if __name__ == "__main__":
+    # Удаляем возможный старый webhook перед запуском polling
+    bot.delete_webhook()
     executor.start_polling(dp, skip_updates=True)
