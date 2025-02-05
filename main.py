@@ -47,11 +47,15 @@ async def record_hours(message: types.Message):
     except ValueError:
         await message.reply("Пожалуйста, отправьте количество часов в виде числа.")
 
-if __name__ == "__main__":
+async def on_start():
     # Удаляем возможный старый webhook перед запуском polling
-    import asyncio
-    async def delete_webhook():
-        await bot.delete_webhook()
+    await bot.delete_webhook()
 
-    asyncio.run(delete_webhook())  # Запускаем асинхронную функцию удаления webhook
+if __name__ == "__main__":
+    from aiogram import executor
+    import asyncio
+
+    # Запуск удаления webhook и старта polling
+    loop = asyncio.get_event_loop()
+    loop.create_task(on_start())  # Удаляем webhook перед запуском
     executor.start_polling(dp, skip_updates=True)
