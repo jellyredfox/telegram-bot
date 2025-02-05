@@ -3,7 +3,7 @@ import os
 from aiogram import Bot, Dispatcher, types
 from aiogram.utils import executor
 
-TOKEN = os.getenv("TELEGRAM_TOKEN")
+TOKEN = os.getenv("TOKEN")
 WEB_APP_URL = os.getenv("WEB_APP_URL")
 
 bot = Bot(token=TOKEN)
