@@ -1,9 +1,10 @@
 import requests
+import os
 from aiogram import Bot, Dispatcher, types
 from aiogram.utils import executor
 
-TOKEN = "YOUR_TELEGRAM_BOT_TOKEN"
-WEB_APP_URL = "YOUR_APPS_SCRIPT_URL"
+TOKEN = os.getenv("TELEGRAM_TOKEN")
+WEB_APP_URL = os.getenv("WEB_APP_URL")
 
 bot = Bot(token=TOKEN)
 dp = Dispatcher(bot)
