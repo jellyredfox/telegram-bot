@@ -1,6 +1,6 @@
 import logging
 import os
-import requests
+import aiohttp
 import asyncio
 from aiogram import Bot, Dispatcher, types
 from aiogram.utils import executor
@@ -34,21 +34,23 @@ async def handle_message(message: types.Message):
     if text.isdigit():  # Если сообщение состоит только из цифр (например, количество часов)
         hours = int(text)  # Преобразуем в число
         try:
-            # Отправляем данные на Google Apps Script
-            response = requests.post(WEB_APP_URL, data={"hours": hours, "comment": ""})
-            response.raise_for_status()  # Проверяем, что запрос прошел успешно
-            await message.reply(f"Вы указали {hours} часов. Информация сохранена!")
-        except requests.exceptions.RequestException as e:
+            # Отправляем данные на Google Apps Script через aiohttp
+            async with aiohttp.ClientSession() as session:
+                async with session.post(WEB_APP_URL, data={"hours": hours, "comment": ""}) as response:
+                    response.raise_for_status()  # Проверяем, что запрос прошел успешно
+                    await message.reply(f"Вы указали {hours} часов. Информация сохранена!")
+        except aiohttp.ClientError as e:
             logging.error(f"Ошибка при отправке данных в Google Apps Script: {e}")
             await message.reply("Произошла ошибка при сохранении данных.")
     else:  # Если это текст (например, комментарий)
         comment = text
         try:
-            # Отправляем данные на Google Apps Script
-            response = requests.post(WEB_APP_URL, data={"hours": 0, "comment": comment})
-            response.raise_for_status()  # Проверяем, что запрос прошел успешно
-            await message.reply(f"Комментарий: '{comment}' сохранен!")
-        except requests.exceptions.RequestException as e:
+            # Отправляем данные на Google Apps Script через aiohttp
+            async with aiohttp.ClientSession() as session:
+                async with session.post(WEB_APP_URL, data={"hours": 0, "comment": comment}) as response:
+                    response.raise_for_status()  # Проверяем, что запрос прошел успешно
+                    await message.reply(f"Комментарий: '{comment}' сохранен!")
+        except aiohttp.ClientError as e:
             logging.error(f"Ошибка при отправке данных в Google Apps Script: {e}")
             await message.reply("Произошла ошибка при сохранении данных.")
 
@@ -57,4 +59,3 @@ if __name__ == '__main__':
     # Проверка, если приложение работает в правильном потоке с активным loop
     loop = asyncio.get_event_loop()  # Получаем текущий event loop
     loop.run_until_complete(executor.start_polling(dp, skip_updates=True))  # Запускаем polling
-
