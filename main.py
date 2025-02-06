@@ -1,7 +1,8 @@
 import logging
 import os
-import aiohttp
+import requests
 import asyncio
+import json  # Добавим поддержку работы с JSON
 from aiogram import Bot, Dispatcher, types
 from aiogram.utils import executor
 from aiogram.types import ParseMode
@@ -33,26 +34,27 @@ async def handle_message(message: types.Message):
     
     if text.isdigit():  # Если сообщение состоит только из цифр (например, количество часов)
         hours = int(text)  # Преобразуем в число
-        try:
-            # Отправляем данные на Google Apps Script через aiohttp
-            async with aiohttp.ClientSession() as session:
-                async with session.post(WEB_APP_URL, data={"hours": hours, "comment": ""}) as response:
-                    response.raise_for_status()  # Проверяем, что запрос прошел успешно
-                    await message.reply(f"Вы указали {hours} часов. Информация сохранена!")
-        except aiohttp.ClientError as e:
-            logging.error(f"Ошибка при отправке данных в Google Apps Script: {e}")
-            await message.reply("Произошла ошибка при сохранении данных.")
+        data = {
+            "user": message.from_user.username,  # Имя пользователя
+            "hours": hours,  # Часы
+            "message": ""  # Пустое сообщение, так как это цифры
+        }
     else:  # Если это текст (например, комментарий)
         comment = text
-        try:
-            # Отправляем данные на Google Apps Script через aiohttp
-            async with aiohttp.ClientSession() as session:
-                async with session.post(WEB_APP_URL, data={"hours": 0, "comment": comment}) as response:
-                    response.raise_for_status()  # Проверяем, что запрос прошел успешно
-                    await message.reply(f"Комментарий: '{comment}' сохранен!")
-        except aiohttp.ClientError as e:
-            logging.error(f"Ошибка при отправке данных в Google Apps Script: {e}")
-            await message.reply("Произошла ошибка при сохранении данных.")
+        data = {
+            "user": message.from_user.username,  # Имя пользователя
+            "hours": 0,  # Часы равны 0
+            "message": comment  # Сообщение
+        }
+    
+    try:
+        # Отправляем данные на Google Apps Script в формате JSON
+        response = requests.post(WEB_APP_URL, json=data)
+        response.raise_for_status()  # Проверяем, что запрос прошел успешно
+        await message.reply(f"Ваши данные сохранены!")
+    except requests.exceptions.RequestException as e:
+        logging.error(f"Ошибка при отправке данных в Google Apps Script: {e}")
+        await message.reply("Произошла ошибка при сохранении данных.")
 
 # Запуск бота
 if __name__ == '__main__':
