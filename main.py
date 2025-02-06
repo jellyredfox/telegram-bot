@@ -1,61 +1,60 @@
+import logging
 import os
-from aiogram import Bot, Dispatcher, types
-from aiogram.types import ParseMode
-from aiogram.utils import executor
 import requests
+import asyncio
+from aiogram import Bot, Dispatcher, types
+from aiogram.utils import executor
+from aiogram.types import ParseMode
 
+# Получаем токен и ссылку на Google Apps Script из переменных окружения
+API_TOKEN = os.getenv("API_TOKEN")
+WEB_APP_URL = os.getenv("WEB_APP_URL")
 
-# Получаем токен и URL из переменных окружения
-TOKEN = '1828791789:AAHvMA095PX9LPWNyVwcPzOJkGTvBDgx8GY'
-WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxCwMASb2tiVt_YZus07sgRIz7hpXE7d8KfBbanNr21JPDZayAoxyE7DZfx4JNCVELxOQ/exec'
+# Проверка, что токен был передан
+if not API_TOKEN or not WEB_APP_URL:
+    raise ValueError("Не указан токен или URL для Google Apps Script!")
 
-# Проверка, если токен или URL пустые
-if not TOKEN or not WEB_APP_URL:
-    raise ValueError("TOKEN или WEB_APP_URL не установлены!")
+# Настроим логирование
+logging.basicConfig(level=logging.INFO)
 
-# Создание экземпляра бота и диспетчера
-bot = Bot(token=TOKEN)
+# Создаем бота и диспетчер
+bot = Bot(token=API_TOKEN)
 dp = Dispatcher(bot)
 
-# Обработчик команды /start
-@dp.message_handler(commands=["start"])
-async def cmd_start(message: types.Message):
-    await message.reply("Привет! Я бот для учета часов. Просто напиши количество отработанных часов.")
+# Команда /start
+@dp.message_handler(commands=['start'])
+async def send_welcome(message: types.Message):
+    await message.reply("Привет! Отправь мне количество отработанных часов или сообщение, и я занесу это в таблицу.")
 
-# Обработчик текста (количество часов)
-@dp.message_handler()
-async def record_hours(message: types.Message):
-    try:
-        hours = int(message.text.strip())  # Преобразуем сообщение в целое число (часы)
-        if hours < 0:
-            raise ValueError("Количество часов не может быть отрицательным.")
-
-        # Отправляем данные в Google Sheets через Apps Script
-        payload = {
-            "hours": hours,
-            "user": message.from_user.full_name,
-            "chat_id": message.from_user.id
-        }
-
-        response = requests.post(WEB_APP_URL, json=payload)
-
-        if response.status_code == 200:
-            await message.reply(f"Записано {hours} часов!")
-        else:
-            await message.reply("Не удалось записать данные. Попробуйте позже.")
+# Обработка всех текстовых сообщений
+@dp.message_handler(content_types=types.ContentType.TEXT)
+async def handle_message(message: types.Message):
+    text = message.text.strip()
     
-    except ValueError:
-        await message.reply("Пожалуйста, отправьте количество часов в виде числа.")
+    if text.isdigit():  # Если сообщение состоит только из цифр (например, количество часов)
+        hours = int(text)  # Преобразуем в число
+        try:
+            # Отправляем данные на Google Apps Script
+            response = requests.post(WEB_APP_URL, data={"hours": hours, "comment": ""})
+            response.raise_for_status()  # Проверяем, что запрос прошел успешно
+            await message.reply(f"Вы указали {hours} часов. Информация сохранена!")
+        except requests.exceptions.RequestException as e:
+            logging.error(f"Ошибка при отправке данных в Google Apps Script: {e}")
+            await message.reply("Произошла ошибка при сохранении данных.")
+    else:  # Если это текст (например, комментарий)
+        comment = text
+        try:
+            # Отправляем данные на Google Apps Script
+            response = requests.post(WEB_APP_URL, data={"hours": 0, "comment": comment})
+            response.raise_for_status()  # Проверяем, что запрос прошел успешно
+            await message.reply(f"Комментарий: '{comment}' сохранен!")
+        except requests.exceptions.RequestException as e:
+            logging.error(f"Ошибка при отправке данных в Google Apps Script: {e}")
+            await message.reply("Произошла ошибка при сохранении данных.")
 
-async def on_start():
-    # Удаляем возможный старый webhook перед запуском polling
-    await bot.delete_webhook()
+# Запуск бота
+if __name__ == '__main__':
+    # Проверка, если приложение работает в правильном потоке с активным loop
+    loop = asyncio.get_event_loop()  # Получаем текущий event loop
+    loop.run_until_complete(executor.start_polling(dp, skip_updates=True))  # Запускаем polling
 
-if __name__ == "__main__":
-    from aiogram import executor
-    import asyncio
-
-    # Запуск удаления webhook и старта polling
-    loop = asyncio.get_event_loop()
-    loop.create_task(on_start())  # Удаляем webhook перед запуском
-    executor.start_polling(dp, skip_updates=True)
