@@ -7,8 +7,8 @@ from aiogram.utils import executor
 from aiogram.types import ParseMode
 
 # Получаем токен и ссылку на Google Apps Script из переменных окружения
-API_TOKEN = os.getenv("API_TOKEN")
-WEB_APP_URL = os.getenv("WEB_APP_URL")
+TOKEN = '1828791789:AAHvMA095PX9LPWNyVwcPzOJkGTvBDgx8GY'
+WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxCwMASb2tiVt_YZus07sgRIz7hpXE7d8KfBbanNr21JPDZayAoxyE7DZfx4JNCVELxOQ/exec'
 
 # Проверка, что токен был передан
 if not API_TOKEN or not WEB_APP_URL:
