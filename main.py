@@ -9,7 +9,7 @@ from datetime import datetime  # Для работы с датой
 
 # Получаем токен и ссылку на Google Apps Script из переменных окружения
 API_TOKEN = '1828791789:AAGgt8DHZVJoiabooHwswxQ2Yl-lEybV5Y8'
-WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwR9lN2B_unWN_W6RTrn6JdPFpFMN0IWCH70GQ1dXutAbB4JEzK-wbr1VUHF_QKcCO0kw/exec'
+WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyT7CwaOE0x8o3XzFIRconUcDWC9V1YN5_iv0SgZ8n02XAeG78rIjOb0eXl_CMo-gkgvQ/exec'
 
 # Настроим логирование
 logging.basicConfig(level=logging.INFO)
