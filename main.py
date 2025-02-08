@@ -27,14 +27,12 @@ async def handle_message(message: types.Message):
     # Диагностика структуры сообщения
     logging.info(f"Сообщение имеет структуру: {message.to_python()}")
 
-    # Проверяем, есть ли атрибут from в объекте message
+    # Проверяем, есть ли атрибут from_ в объекте message
     if hasattr(message, 'from'):
-        user_name = message.from.first_name
-        if message.from.last_name:
-            user_name += f" {message.from.last_name}"
+        user_name = message['from']['first_name']
     else:
         user_name = "Неизвестный пользователь"
-        logging.warning(f"Сообщение не содержит атрибута 'from'")
+        logging.warning(f"Сообщение не содержит атрибута 'from_'")
 
     # Инициализируем переменные для hours и comment
     hours = 0
