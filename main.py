@@ -6,7 +6,7 @@ from aiogram.utils import executor
 from aiogram.types import User
 
 API_TOKEN = "1828791789:AAGgt8DHZVJoiabooHwswxQ2Yl-lEybV5Y8"
-WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyqnNIPY5ReJ0nH60edoV_pkaECmxtx7pJJTK3xRg0mXNA0uXLnrcj_LB83XOeKsvaJNQ/exec"
+WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwNm0PVeunnGO-Nx10F7vzj-gcm4vyU9rPwvEkmTtLEwc7A326aEbt4pToOOI6zqOrSlQ/exec"
 
 logging.basicConfig(level=logging.INFO)
 
