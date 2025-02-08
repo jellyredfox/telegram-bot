@@ -33,6 +33,9 @@ async def handle_message(message: types.Message):
         user_name = "Неизвестный пользователь"
         logging.warning(f"Сообщение не содержит атрибута 'from_'")
 
+    # Логируем данные перед отправкой
+    logging.info(f"Отправляем данные: hours={hours}, comment={comment}, user={user_name}")
+
     # Проверяем, есть ли запятая
     if "," not in text:
         await message.reply("⚠️ Пожалуйста, отправь данные в формате: 3, установка розеток")
