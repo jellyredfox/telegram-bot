@@ -23,6 +23,9 @@ async def handle_message(message: types.Message):
 
     # Логируем объект сообщения для диагностики
     logging.info(f"Получено сообщение: {message}")
+    
+    # Диагностика структуры сообщения
+    logging.info(f"Сообщение имеет структуру: {message.to_python()}")
 
     # Проверяем, есть ли атрибут from_ в объекте message
     if hasattr(message, 'from_'):
