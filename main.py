@@ -33,8 +33,9 @@ async def handle_message(message: types.Message):
         user_name = "Неизвестный пользователь"
         logging.warning(f"Сообщение не содержит атрибута 'from_'")
 
-    # Логируем данные перед отправкой
-    logging.info(f"Отправляем данные: hours={hours}, comment={comment}, user={user_name}")
+    # Инициализируем переменные для hours и comment
+    hours = 0
+    comment = ""
 
     # Проверяем, есть ли запятая
     if "," not in text:
@@ -59,6 +60,7 @@ async def handle_message(message: types.Message):
 
     try:
         # Отправляем данные на Google Apps Script
+        logging.info(f"Отправляем данные: hours={hours}, comment={comment}, user={user_name}")
         response = requests.post(WEB_APP_URL, json={
             "hours": hours,
             "comment": comment,
