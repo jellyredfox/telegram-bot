@@ -21,6 +21,18 @@ async def send_welcome(message: types.Message):
 async def handle_message(message: types.Message):
     text = message.text.strip()
 
+    # Логируем объект сообщения для диагностики
+    logging.info(f"Получено сообщение: {message}")
+
+    # Проверяем, есть ли атрибут from_ в объекте message
+    if hasattr(message, 'from_'):
+        user_name = message.from_.first_name
+        if message.from_.last_name:
+            user_name += f" {message.from_.last_name}"
+    else:
+        user_name = "Неизвестный пользователь"
+        logging.warning(f"Сообщение не содержит атрибута 'from_'")
+
     # Проверяем, есть ли запятая
     if "," not in text:
         await message.reply("⚠️ Пожалуйста, отправь данные в формате: 3, установка розеток")
@@ -41,11 +53,6 @@ async def handle_message(message: types.Message):
     if not comment:
         await message.reply("⚠️ После запятой добавьте описание работы, например: 3, укладка плитки")
         return
-
-    # Получаем имя пользователя
-    user_name = message.from_.first_name
-    if message.from_.last_name:
-        user_name += f" {message.from_.last_name}"
 
     try:
         # Отправляем данные на Google Apps Script
