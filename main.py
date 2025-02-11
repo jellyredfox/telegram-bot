@@ -5,7 +5,7 @@ from aiogram import Bot, Dispatcher, types
 from aiogram.utils import executor
 
 API_TOKEN = "1828791789:AAGgt8DHZVJoiabooHwswxQ2Yl-lEybV5Y8"
-WEB_APP_URL = "https://script.google.com/macros/s/AKfycby3UW0pw11Ujq-g4GCSBe48DU5jJgPfuGa9b4dlQ3W7WwxgmMkv0vlPKAI8TrlQ7mY7Dw/exec"
+WEB_APP_URL = "https://script.google.com/macros/s/AKfycbx2mQ17P8MjjKyFqKZsyrvBDyJbP6yqifQuakNVI3OnwGkWnqM6cPSSWcjZKToqTS8p/exec"
 
 logging.basicConfig(level=logging.INFO)
 
