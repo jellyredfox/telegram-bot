@@ -3,7 +3,6 @@ import requests
 import asyncio
 from aiogram import Bot, Dispatcher, types
 from aiogram.utils import executor
-from aiogram.types import User
 
 API_TOKEN = "1828791789:AAGgt8DHZVJoiabooHwswxQ2Yl-lEybV5Y8"
 WEB_APP_URL = "https://script.google.com/macros/s/AKfycby3UW0pw11Ujq-g4GCSBe48DU5jJgPfuGa9b4dlQ3W7WwxgmMkv0vlPKAI8TrlQ7mY7Dw/exec"
@@ -13,38 +12,56 @@ logging.basicConfig(level=logging.INFO)
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher(bot)
 
+# Обработчик команды /start
 @dp.message_handler(commands=['start'])
 async def send_welcome(message: types.Message):
-    await message.reply("Привет! Отправь мне количество часов и описание работы в формате: 3, установка розеток")
+    await message.reply(
+        "Привет!\n"
+        "Отправь мне количество часов и описание работы в формате: 3, установка розеток\n"
+        "Или введи команду 'мои часы', чтобы узнать, сколько часов ты отработал за текущий спринт."
+    )
 
+# Обработчик команды "мои часы"
+@dp.message_handler(lambda message: message.text.strip().lower() == "мои часы")
+async def handle_my_hours(message: types.Message):
+    # Получаем имя пользователя
+    user_name = message.from_user.first_name if message.from_user and message.from_user.first_name else "Неизвестный пользователь"
+    try:
+        # Отправляем GET-запрос с параметрами action=getHours и user=<имя пользователя>
+        params = {"action": "getHours", "user": user_name}
+        logging.info(f"Запрос к Google Apps Script для получения часов пользователя {user_name}. Параметры: {params}")
+        response = requests.get(WEB_APP_URL, params=params)
+        response.raise_for_status()  # Проверка успешного запроса
+        data = response.json()  # Ожидается JSON, например: {"hours": 15}
+        total_hours = data.get("hours", 0)
+        await message.reply(f"✅ {user_name}, отработано часов в текущем спринте: {total_hours}")
+    except Exception as e:
+        logging.error(f"Ошибка получения данных из Google Apps Script: {e}")
+        await message.reply("❌ Ошибка при получении данных. Попробуйте позже.")
+
+# Обработчик сообщений с данными о часах и работе (POST-запись)
 @dp.message_handler(content_types=types.ContentType.TEXT)
 async def handle_message(message: types.Message):
     text = message.text.strip()
 
+    # Если сообщение совпадает с командой "мои часы", то данный обработчик уже сработал
+    if text.lower() == "мои часы":
+        return
+
     # Логируем объект сообщения для диагностики
     logging.info(f"Получено сообщение: {message}")
-    
-    # Диагностика структуры сообщения
     logging.info(f"Сообщение имеет структуру: {message.to_python()}")
 
-    # Проверяем, есть ли атрибут from_ в объекте message
-    if 'from' in message and 'first_name' in message['from']:
-        user_name = message['from']['first_name']
-    else:
-        user_name = 'Неизвестный пользователь'
+    # Получаем имя пользователя
+    user_name = message.from_user.first_name if message.from_user and message.from_user.first_name else "Неизвестный пользователь"
+    logging.info(f"Имя пользователя: {user_name}")
 
-    logging.info(f'Имя пользователя: {user_name}')
-
-    # Инициализируем переменные для hours и comment
-    hours = 0
-    comment = ""
-
-    # Проверяем, есть ли запятая
+    # Проверка формата сообщения: ожидается наличие запятой
     if "," not in text:
         await message.reply("⚠️ Пожалуйста, отправь данные в формате: 3, установка розеток")
         return
 
-    parts = text.split(",", 1)  # Разделяем по первому вхождению запятой
+    parts = text.split(",", 1)  # Разделяем по первой запятой
     hours_part = parts[0].strip()
     comment = parts[1].strip() if len(parts) > 1 else ""
 
@@ -61,12 +78,12 @@ async def handle_message(message: types.Message):
         return
 
     try:
-        # Отправляем данные на Google Apps Script
+        # Отправляем данные на Google Apps Script (POST-запрос)
         logging.info(f"Отправляем данные: hours={hours}, comment={comment}, user={user_name}")
         response = requests.post(WEB_APP_URL, json={
             "hours": hours,
             "comment": comment,
-            "user": user_name  # Добавляем имя пользователя
+            "user": user_name
         })
         response.raise_for_status()  # Проверяем, что запрос прошел успешно
         await message.reply(f"✅ Записано: {hours} часов. Комментарий: {comment}")
@@ -75,5 +92,4 @@ async def handle_message(message: types.Message):
         await message.reply("❌ Ошибка при сохранении данных.")
 
 if __name__ == '__main__':
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(executor.start_polling(dp, skip_updates=True))
+    executor.start_polling(dp, skip_updates=True)
