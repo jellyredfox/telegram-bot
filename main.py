@@ -91,5 +91,18 @@ async def handle_message(message: types.Message):
         logging.error(f"Ошибка при отправке данных в Google Apps Script: {e}")
         await message.reply("❌ Ошибка при сохранении данных.")
 
+
+@dp.message_handler(lambda message: message.text.strip().lower() in ["отчет", "/отчет"])
+async def handle_report(message: types.Message):
+    try:
+        response = requests.get(WEB_APP_URL, params={"action": "sprintReport"})
+        response.raise_for_status()
+        await message.reply(response.text)
+    except Exception as e:
+        logging.error(f"Ошибка получения отчёта: {e}")
+        await message.reply("❌ Не удалось получить отчёт.")
+
+
+
 if __name__ == '__main__':
     executor.start_polling(dp, skip_updates=True)
