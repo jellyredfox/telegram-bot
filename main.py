@@ -40,6 +40,18 @@ async def handle_my_hours(message: types.Message):
         await message.reply("❌ Ошибка при получении данных. Попробуйте позже.")
 
 
+@dp.message_handler(lambda message: message.text.strip().lower() in ["все часы", "/все"])
+async def handle_all_hours(message: types.Message):
+    try:
+        response = requests.get(WEB_APP_URL, params={"action": "allHours"})
+        response.raise_for_status()
+        await message.reply(response.text)
+    except Exception as e:
+        logging.error(f"Ошибка получения всех часов: {e}")
+        await message.reply("❌ Не удалось получить данные за всё время.")
+       
+
+
 @dp.message_handler(lambda message: message.text.strip().lower() in ["отчет", "/отчет"])
 async def handle_report(message: types.Message):
     try:
