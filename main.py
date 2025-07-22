@@ -3,8 +3,13 @@ import requests
 import asyncio
 from aiogram import Bot, Dispatcher, types
 from aiogram.utils import executor
+import os
+from dotenv import load_dotenv
+from pathlib import Path
+load_dotenv(dotenv_path=Path(__file__).parent / ".env")
 
-API_TOKEN = "1828791789:AAGgt8DHZVJoiabooHwswxQ2Yl-lEybV5Y8"
+TOKEN = os.getenv("TELEGRAM_TOKEN")
+API_TOKEN = TOKEN
 WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyGJoFBcP5cD2lapQZPvKm20j-Eac7AuOQxPHo9ux16L0CNvg3Gwg1wz4cZK65m98-kag/exec"
 
 logging.basicConfig(level=logging.INFO)
