@@ -195,7 +195,15 @@ async def handle_message(message: types.Message):
         }
         logging.info(f"POST add hours={hours} user={user_name} chat_id={chat_id}")
         response = requests.post(WEB_APP_URL, json=payload, timeout=20)
+
+        logging.info(f"GAS response status={response.status_code}")
+        logging.info(f"GAS response text={response.text}")
+
         response.raise_for_status()
+        if response.text.startswith("Error:"):
+            logging.error(f"GAS returned error text: {response.text}")
+            await message.reply("❌ Ошибка на стороне Google Apps Script:\n" + response.text)
+            return
         await message.reply(f"✅ Записано: {hours} часов. Комментарий: {comment}")
     except requests.exceptions.RequestException as e:
         logging.error(f"Ошибка POST: {e}")
