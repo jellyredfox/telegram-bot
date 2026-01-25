@@ -6,6 +6,7 @@ import os
 import re
 from dotenv import load_dotenv
 from pathlib import Path
+from typing import Optional
 
 load_dotenv(dotenv_path=Path(__file__).parent / ".env")
 
@@ -20,7 +21,7 @@ bot = Bot(token=API_TOKEN)
 dp = Dispatcher(bot)
 
 
-def extract_spreadsheet_id(text: str) -> str | None:
+def extract_spreadsheet_id(text: str) -> Optional[str]:
     """
     Accepts either:
     - spreadsheet id directly
