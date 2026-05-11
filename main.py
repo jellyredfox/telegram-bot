@@ -13,7 +13,7 @@ load_dotenv(dotenv_path=Path(__file__).parent / ".env")
 TOKEN = os.getenv("TELEGRAM_TOKEN")
 API_TOKEN = TOKEN
 
-WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzWBw4DZ9cqTIHvZIxG4DYbJoWHCaYjS6djtNp3KW1gGu729CHNjXP6y9HbV6LSZ5p5_A/exec"
+WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzRb2jSAyyVt3D2an7Ra1w8gJadp1Wqhmk9KF6PTRcZ75J2JbA3PAcOgbYUnCPTXyq1nQ/exec"
 
 logging.basicConfig(level=logging.INFO)
 
